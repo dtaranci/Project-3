@@ -1,0 +1,106 @@
+﻿@using WebApp.Viewmodels
+@model WebApp.Viewmodels.ProductVM
+
+@{
+    ViewData["Title"] = "Purchase";
+    var currentDateTime = DateTime.Now.ToString("F");
+    ProductVM product = ViewBag.Product;
+    var cultureInfo = System.Globalization.CultureInfo.CurrentCulture;
+    string formattedCurrency = Math.Round((decimal)product.Price, 2).ToString("C", cultureInfo);
+}
+
+@* <h1>Purchase</h1>
+
+<div>
+    <h4>ProductVM</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CategoryId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CategoryId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CategoryName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CategoryName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ImageURL)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ImageURL)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IsAvailable)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IsAvailable)
+        </dd>
+    </dl>
+</div> *@
+
+@* @model MVC.Viewmodels.ProductVM
+
+@{
+    ViewData["Title"] = "Purchase";
+    var currentDateTime = DateTime.Now.ToString("F"); // Format the date and time
+}
+
+<h1 style="text-align: center;">Thank You for Purchasing <strong>@Model.Name</strong></h1>
+<p style="text-align: center; font-size: smaller;">Purchased on: @currentDateTime</p>
+
+
+<div style="text-align: center;">
+    <a asp-action="Index" class="btn btn-outline-primary">Back to List</a>
+</div> *@
+<style>
+    .centered-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+        margin-top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+
+<div class="centered-container">
+    <h1>Thank You for Purchasing</h1>
+    <h1><strong>@product.Name</strong></h1>
+    <h3><strong>@formattedCurrency</strong></h3>
+    @{
+        var Extensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+        var isImage = !string.IsNullOrEmpty(product.ImageURL) && Extensions.Any(ext => product.ImageURL.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+    }
+    @{
+        if (isImage)
+        {
+            <img src="@product.ImageURL" alt="Product Image" style="width: 300px;" class="img-fluid" />
+        }
+    }
+    <p style="font-size: smaller;">Purchased on: @currentDateTime</p>
+    <a asp-action="Search" class="btn btn-outline-primary">Back to List</a>
+</div>

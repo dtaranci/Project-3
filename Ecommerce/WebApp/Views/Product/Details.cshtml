@@ -1,0 +1,106 @@
+﻿@model WebApp.Viewmodels.ProductVM
+
+@{
+    ViewData["Title"] = "Details";
+    var user = ViewContext.HttpContext.User;
+}
+
+<h1>Product Details</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <h4>Product Image</h4>
+        @{
+            var Extensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+            var isImage = !string.IsNullOrEmpty(Model.ImageURL) && Extensions.Any(ext => Model.ImageURL.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+        }
+        <img src="@(isImage ? Model.ImageURL : @"/Images/placeholder.png")" alt="Product Image" style="width: 300px;" class="img-fluid" />
+    </div>
+    <div class="col-md-8">
+        <h4>ProductVM</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.CategoryName)
+            </dt>
+            <dd class="col-sm-10">
+                <p>@ViewBag.CategoryName</p>
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            @if (user.IsInRole("Admin"))
+            {
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.ImageURL)
+                </dt>
+                <dd class="col-sm-10">
+                    @{
+                        var result = (string.IsNullOrEmpty(Model.ImageURL) ? "null" : Model.ImageURL);
+                    }
+                    @Html.DisplayFor(model => result)
+                </dd>
+            }
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayNameFor(model => model.AvailableCountries)
+            </dt>
+            <dd class="col-sm-10 mt-3">
+                @for (int i = 0; i < Model.AvailableCountries.Count; i++)
+                {
+                    <div>
+                        <li>@Model.AvailableCountries[i].Name</li>
+                    </div>
+                }
+            </dd>
+            <dt class="col-sm-2 mt-3">
+                @Html.DisplayNameFor(model => model.IsAvailable)
+            </dt>
+            <dd class="col-sm-10 mt-3">
+                @{
+                    string IsResult = "";
+                    if (user.IsInRole("Admin"))
+                    {
+                        IsResult = Model.IsAvailable.HasValue ? (Convert.ToBoolean(Model.IsAvailable.Value) ? "True" : "False") : "Unknown";
+                    }
+                    else
+                    {
+                        IsResult = Model.IsAvailable.HasValue ? (Convert.ToBoolean(Model.IsAvailable.Value) ? "Available" : "Not Available") : "Unknown";
+                    }
+                }
+                @Html.DisplayFor(model => IsResult)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div>
+    @if (user.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-outline-primary" })
+    }
+    <a asp-action="Search" class="btn btn-outline-secondary">Back to List</a>
+</div>
+@if (!user.IsInRole("Admin"))
+{
+    <div class="d-flex justify-content-end">
+        <a asp-action="Purchase" asp-route-id="@Model.Id" class="btn btn-success">Purchase</a>
+    </div>
+}
+
+
+

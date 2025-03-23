@@ -1,0 +1,214 @@
+﻿@model WebApp.Viewmodels.UserVM
+
+@{
+    ViewData["Title"] = "ProfileDetails";
+}
+
+<h1>Profile Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class="col-sm-10" id="FirstName">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-10" id="LastName">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10" id="Email">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+        <dd class="col-sm-10" id="Phone">
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+    </dl>
+</div>
+<div>
+    @* @Html.ActionLink("Edit", "ProfileEdit", new { id = Model.Id }) | *@
+    <a asp-action="ProfileEdit" asp-route-id="@Model.Id" id="ajaxEdit" class="btn btn-outline-primary">Edit</a> |
+    <a asp-action="Search" asp-controller="Product" class="btn btn-outline-secondary">Back to List</a> |
+</div>
+
+<!--Paste this at the end of the HTML, just before "Scripts" section-->
+<div class="modal fade" id="AjaxEditModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update User Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="mb-3">
+                        <label for="FirstNameInput" class="form-label">First name</label>
+                        <input id="FirstNameInput" class="form-control">
+                        <p id="FirstNameError" class="text-danger" style="display: none;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="LastNameInput" class="form-label">Last name</label>
+                        <input id="LastNameInput" class="form-control">
+                        <p id="LastNameError" class="text-danger" style="display: none;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="EmailInput" class="form-label">E-mail</label>
+                        <input type="email" id="EmailInput" class="form-control">
+                        <p id="EmailError" class="text-danger" style="display: none;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="PhoneInput" class="form-label">Phone</label>
+                        <input type="tel" id="PhoneInput" class="form-control">
+                        <p id="PhoneError" class="text-danger" style="display: none;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="SaveProfileButton" type="button" class="btn btn-primary">Save profile</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const modelId = "@Model.Id";
+
+        const ajaxEditModalEl = $("#AjaxEditModal")[0];
+        const ajaxEditModal = new bootstrap.Modal(ajaxEditModalEl);
+
+        const ajaxUpdate = () => {
+            $.ajax({
+                url: `/User/GetProfileData/${modelId}`,
+                method: "GET"
+            })
+                .done((data) => {
+                    $("#FirstName").text(data.firstName);
+                    $("#LastName").text(data.lastName);
+                    $("#Email").text(data.email);
+                    $("#Phone").text(data.phone);
+                    console.log(data);
+                });
+        };
+
+        $("#ajaxUpdate").click((e) => {
+            e.preventDefault();
+            ajaxUpdate();
+        });
+
+        $("#ajaxEdit").click((e) => {
+            e.preventDefault();
+
+            const firstName = $("#FirstName").text().trim();
+            $("#FirstNameInput").val(firstName);
+
+            const lastName = $("#LastName").text().trim();
+            $("#LastNameInput").val(lastName);
+
+            const email = $("#Email").text().trim();
+            $("#EmailInput").val(email);
+
+            const phone = $("#Phone").text().trim();
+            $("#PhoneInput").val(phone);
+
+            ajaxEditModal.show();
+        });
+
+        const validateProfile = (profile) => {
+            let isValid = true;
+            let errorMessage = "";
+
+            if (!profile.firstName) {
+                isValid = false;
+                errorMessage += "First name is required.\n";
+                $("#FirstNameError").text("First name is required.")
+                $("#FirstNameError").show();
+            } else {
+                $("#FirstNameError").hide();
+            }
+            if (!profile.lastName) {
+                isValid = false;
+                errorMessage += "Last name is required.\n";
+                $("#LastNameError").text("Last name is required.")
+                $("#LastNameError").show();
+            } else {
+                $("#LastNameError").hide();
+            }
+            if (!profile.email) {
+                isValid = false;
+                errorMessage += "Email is required.\n";
+                $("#EmailError").text("Email is required.")
+                $("#EmailError").show();
+            } else {
+                //const emailPattern = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/; //email pattern 1
+                const emailPattern = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ // from https://emailregex.com/
+                if (!emailPattern.test(profile.email)) {
+                    isValid = false;
+                    errorMessage += "Email format is invalid.\n";
+                    $("#EmailError").text("Email format is invalid.")
+                    $("#EmailError").show();
+                } else {
+                    $("#EmailError").hide();
+                }
+            }
+            if (!profile.phone) {
+                isValid = false;
+                errorMessage += "Phone number is required.\n";
+                $("#PhoneError").text("Phone number is required.")
+                $("#PhoneError").show();
+            } else {
+                $("#PhoneError").hide();
+            }
+
+            //if (!isValid) {
+            //    alert(errorMessage);
+            //}
+
+            return isValid;
+        };
+
+        $("#SaveProfileButton").click((e) => {
+            e.preventDefault();
+
+            const profile = {
+                firstName: $("#FirstNameInput").val(),
+                lastName: $("#LastNameInput").val(),
+                email: $("#EmailInput").val(),
+                phone: $("#PhoneInput").val(),
+            };
+
+            if (validateProfile(profile)) {
+                $.ajax({
+                    url: `/User/SetProfileData/${modelId}`,
+                    method: "PUT",
+                    data: JSON.stringify(profile),
+                    contentType: "application/json"
+                })
+                .done(() => {
+                    ajaxEditModal.hide();
+                    ajaxUpdate();
+                })
+                .fail(() => {
+                    alert("An error was encountered during operation");
+                });
+            }
+        });
+    </script>
+}

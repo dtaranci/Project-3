@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@{
+    var user = this.ViewContext.HttpContext.User;
+    bool loggedIn = false;
+    string username = "";
+    if (user != null && !string.IsNullOrEmpty(user.Identity.Name))
+    {
+        loggedIn = true;
+        username = user.Identity.Name;
+    }
+}
+<div class="text-center">
+    <h1 class="display-4">Ecommerce</h1>
+    <p>Webshop for electronics and vehicles</p>
+    <div>
+        <img src="Images/gtx 780.jpg" alt="gtx780" style="width: 300px;">
+        <img src="Images/rtx3060.jpg" alt="gtx780" style="width: 300px;">
+        <img src="Images/gtx1060.jpg" alt="gtx780" style="width: 300px;">
+    </div>
+    @if (loggedIn)
+    {
+        <p>Browse our products</p>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Search", "Product")'">View</button>
+        </div>
+    }
+    else
+    {
+        <p>Login now to view the webshop!</p>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Login", "User")'">Login</button>
+        </div>
+    }
+
+</div>

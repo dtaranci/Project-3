@@ -1,0 +1,202 @@
+﻿@using WebApp.Viewmodels;
+@model SearchVM
+
+@{
+    ViewData["Title"] = "Index";
+    var user = ViewContext.HttpContext.User;
+    var categories = ViewBag.OnetoMany as List<Category>;
+}
+@if (user.IsInRole("Admin"))
+{
+    <h1>Product Search (Admin)</h1>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
+else
+{
+    <h1>Product Search</h1>
+}
+
+<form asp-action="Search" method="GET">
+    <div class="row">
+        <div class="col-8">
+            <input asp-for="Term" class="form-control" placeholder="Search product" />
+        </div>
+        <div class="col-auto">
+            <label class="form-label mt-1">Sort by:</label>
+        </div>
+        <div class="col-auto">
+@*             <select asp-for="OrderBy" class="form-select">
+                @if (user.IsInRole("Admin"))
+                {
+                    <option value="id">(default)</option>
+                    <option>Id</option>
+                }
+                else
+                {
+                    <option value="Name">(default)</option>
+                }
+
+                <option>Name</option>
+                <option>Category</option>
+                <option>Price</option>
+                <option>Country</option>
+                <option>Description</option>
+                <option>Availability</option>
+            </select> *@
+            <select asp-for="OrderBy" class="form-select">
+                <option value="">(default)</option>
+                @foreach (Category category in categories)
+                {
+                    <option>@category.Name</option>
+                }
+
+
+            </select>
+        </div>
+        <div class="col-auto">
+            <select asp-for="Size" class="form-select">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <input type="submit" value="Go" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().CategoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().Price)
+            </th>
+            @if (user.IsInRole("Admin"))
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Products.FirstOrDefault().ImageURL)
+                </th>
+            }
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().IsAvailable)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.FirstOrDefault().AvailableCountries)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Products) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                <h5><span class="badge bg-info text-light">@Html.DisplayFor(modelItem => item.CategoryName)</span></h5>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            @if (user.IsInRole("Admin"))
+            {
+                    var temp = "";
+                    if (!string.IsNullOrEmpty(item.ImageURL))
+                    {
+
+                        @* temp = item.ImageURL; *@
+                        temp = "exists";
+                    }
+                    else
+                    {
+                        temp = "null";
+                    }
+                <td>
+                    @Html.DisplayFor(modelItem => temp)
+                </td>
+            }
+            @if (user.IsInRole("Admin"))
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsAvailable)
+                    </td>
+                }
+                else
+                {
+                    var temp = (item.IsAvailable == true ? "Yes" : "No");
+                <td>
+                    @Html.DisplayFor(modelItem => temp)
+                </td>
+            }
+            <td>
+                @foreach (var country in item.AvailableCountries)
+                {
+                    <li>@country.Name</li>
+                }
+            </td>
+            @if (user.IsInRole("Admin"))
+            {
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-primary" }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-outline-secondary" }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger" })
+                </td>
+            }
+            else {
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-outline-secondary" })
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>
+<nav>
+    <ul class="pagination">
+        @for (int i = Model.FromPager; i <= Model.ToPager; i++)
+        {
+            var linkText = @i.ToString();
+            if (i != 1 && i == Model.FromPager)
+            {
+                linkText = "«";
+            }
+            else if (i != Model.LastPage && i == Model.ToPager)
+            {
+                linkText = "»";
+            }
+
+            var linkClass = "page-item";
+            if (i == Model.Page)
+            {
+                linkClass = "page-item active";
+            }
+            <li class="@linkClass">
+                @Html.ActionLink(
+                         @linkText,
+                         "Search",
+                         new
+                         {
+                             term = Model.Term,
+                             orderby = Model.OrderBy,
+                             page = i,
+                             size = Model.Size
+                         },
+                         new { @class = "page-link" })
+            </li>
+        }
+    </ul>
+</nav>

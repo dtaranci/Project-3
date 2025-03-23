@@ -1,0 +1,87 @@
+﻿@model WebApp.Viewmodels.ProductVM
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class="form-control">
+                    <option value="">Select a category</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        if (category.IdCategory == Model.CategoryId)
+                        {
+                            <option value="@category.IdCategory" selected="selected">@category.Name</option>
+                        }
+                        <option value="@category.IdCategory">@category.Name</option>
+                        
+                    }
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageURL" class="control-label"></label>
+                <input asp-for="ImageURL" class="form-control" />
+                <span asp-validation-for="ImageURL" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Countries</label>
+                @for (int i = 0; i < Model.AvailableCountries.Count; i++)
+                {
+                    <div>
+                        <input type="checkbox" name="AvailableCountries[@i].IsSelected" value="true" @(Convert.ToBoolean(Model.AvailableCountries[@i].IsSelected) == true ? "checked='checked'" : string.Empty) />
+                        <input type="hidden" name="AvailableCountries[@i].Id" value="@Model.AvailableCountries[i].Id" />
+                        <input type="hidden" name="AvailableCountries[@i].Name" value="@Model.AvailableCountries[i].Name" />
+                        <label>@Model.AvailableCountries[i].Name</label>
+                        <span asp-validation-for="@Model.AvailableCountries[i]" class="text-danger"></span>
+                    </div>
+                }
+                <span asp-validation-for="@Model.AvailableCountries" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="IsAvailable" class="control-label"></label>
+                <input type="checkbox" name="IsAvailable" value="true" @(Convert.ToBoolean(Model.IsAvailable) == true ? "checked='checked'" : string.Empty) />
+                <input type="hidden" name="IsAvailable" value="false" /> 
+                <span asp-validation-for="IsAvailable" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary mt-3" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Search" class="btn btn-outline-secondary mt-3">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

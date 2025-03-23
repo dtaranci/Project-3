@@ -1,0 +1,28 @@
+﻿@using (Html.BeginForm())
+{
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center mb-5">
+                    <h2 class="heading-section">Login</h2>
+                </div>
+                <div class="text-center">
+                    <img src="Images/gtx 780.jpg" class="img" alt="..." style="width: 300px;">
+                </div>
+                <div class="col-md-7 col-lg-5">
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        @Html.Label(labelText: "Username", expression: "username")
+                        @Html.TextBox("Username", value: "", htmlAttributes: new { @class = "form-control", type="username"})
+                    </div>
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        @Html.Label(labelText: "Password", expression: "password")
+                        @Html.TextBox("Password", value: "", htmlAttributes: new { @class = "form-control", type = "password" })
+                    </div>
+                    <div>
+                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="form-control btn btn-primary rounded submit px-3">Sign in</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
